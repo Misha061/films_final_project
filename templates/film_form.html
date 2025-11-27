@@ -1,0 +1,83 @@
+{% extends 'base.html' %}
+
+{% block title %}
+    {% if 'score' in form.fields %}
+        {% if form.instance.pk %}Зміна оцінки{% else %}Оцінити фільм{% endif %}
+    {% else %}
+        {% if form.instance.pk %}Редагування фільму{% else %}Новий фільм{% endif %}
+    {% endif %}
+{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-md-8 col-lg-6">
+        <div class="card shadow-sm border-0">
+            <div class="card-header bg-white border-bottom py-3">
+                <h4 class="mb-0 text-primary">
+                    {% if 'score' in form.fields %}
+                        <i class="fas fa-star me-2"></i>
+                        {% if form.instance.pk %}Змінити мою оцінку{% else %}Поставити оцінку{% endif %}
+                    {% else %}
+                        {% if form.instance.pk %}
+                            <i class="fas fa-edit me-2"></i> Редагувати фільм
+                        {% else %}
+                            <i class="fas fa-plus-circle me-2"></i> Додати новий фільм
+                        {% endif %}
+                    {% endif %}
+                </h4>
+            </div>
+            <div class="card-body p-4">
+                <form method="post">
+                    {% csrf_token %}
+
+                    {% for field in form %}
+                    <div class="mb-3">
+                        <label class="form-label fw-bold text-secondary small text-uppercase">{{ field.label }}</label>
+
+                        {{ field }}
+
+                        {% if field.name == 'photoname' %}
+                            <div class="form-text text-muted bg-light p-2 rounded border">
+                                <i class="fas fa-info-circle text-primary"></i>
+                                Вкажіть точну назву файлу з папки <code>static</code>. <br>
+                                Наприклад: <code>avatar.jpg</code> або <code>images/matrix.png</code>
+                            </div>
+                        {% endif %}
+
+                        {% if field.name == 'score' %}
+                            <div class="form-text text-muted">
+                                Оберіть оцінку від 1 до 5 (або 10).
+                            </div>
+                        {% endif %}
+
+                        {% if field.errors %}
+                            <div class="text-danger small mt-1">
+                                {{ field.errors }}
+                            </div>
+                        {% endif %}
+                    </div>
+                    {% endfor %}
+
+                    <div class="d-flex justify-content-end gap-2 mt-4">
+                        {% if 'score' in form.fields %}
+                            {% if form.instance.film %}
+                                <a href="{% url 'film_detail' form.instance.film.pk %}" class="btn btn-light text-secondary border">Скасувати</a>
+                            {% elif view.kwargs.pk %}
+                                <a href="{% url 'film_detail' view.kwargs.pk %}" class="btn btn-light text-secondary border">Скасувати</a>
+                            {% else %}
+                                <a href="{% url 'film_catalog' %}" class="btn btn-light text-secondary border">Скасувати</a>
+                            {% endif %}
+                        {% else %}
+                            <a href="{% url 'film_catalog' %}" class="btn btn-light text-secondary border">Скасувати</a>
+                        {% endif %}
+
+                        <button type="submit" class="btn btn-primary px-4 fw-bold shadow-sm">
+                            <i class="fas fa-save"></i> Зберегти
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

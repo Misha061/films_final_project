@@ -1,0 +1,150 @@
+{% load static %}
+
+<html lang="uk">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}My Cinema{% endblock %}</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+
+    <style>
+        body {
+            background-color: #f0f2f5; /* Світлий фон сторінки */
+            color: #212529; /* Темний текст */
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+
+        /* Навігація - біла з тінню */
+        .navbar {
+            background-color: #ffffff !important;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.08);
+        }
+        .navbar-brand {
+            color: #0d6efd !important; /* Синій бренд */
+            font-weight: bold;
+        }
+        .nav-link {
+            color: #555 !important;
+        }
+        .nav-link:hover {
+            color: #0d6efd !important;
+        }
+        .nav-link.active {
+            color: #0d6efd !important;
+            font-weight: 600;
+        }
+
+        /* Картки - білі з легкою тінню */
+        .card {
+            background-color: #ffffff;
+            border: none; /* Прибираємо рамки */
+            border-radius: 10px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+        .card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 20px rgba(0,0,0,0.1);
+        }
+
+        /* Стилізація полів вводу (Django форми) */
+        input[type="text"], input[type="password"], input[type="email"], textarea, select {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #ced4da; /* Стандартний сірий бордер */
+            border-radius: 6px;
+            background-color: #fff;
+            color: #212529;
+            margin-bottom: 10px;
+            transition: border-color 0.15s ease-in-out, box-shadow 0.15s ease-in-out;
+        }
+        input:focus, textarea:focus, select:focus {
+            border-color: #86b7fe;
+            outline: 0;
+            box-shadow: 0 0 0 0.25rem rgba(13, 110, 253, 0.25);
+        }
+
+        main { flex: 1; }
+
+        footer {
+            background-color: #ffffff;
+            margin-top: auto;
+            padding: 20px 0;
+            border-top: 1px solid #eaeaea;
+            text-align: center;
+            color: #6c757d;
+        }
+    </style>
+</head>
+<body>
+
+    <nav class="navbar navbar-expand-lg navbar-light mb-4">
+        <div class="container">
+            <a class="navbar-brand" href="{% url 'film_catalog' %}">
+                <i class="fas fa-film"></i> MyCinema
+            </a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav me-auto">
+                    <li class="nav-item">
+                        <a class="nav-link" href="{% url 'film_catalog' %}">Каталог</a>
+                    </li>
+                </ul>
+                <ul class="navbar-nav ms-auto align-items-center">
+                    {% if user.is_authenticated %}
+                        <li class="nav-item">
+                            <a class="btn btn-primary btn-sm mx-2 rounded-pill px-3" href="{% url 'film_create' %}">
+                                <i class="fas fa-plus"></i> Додати фільм
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <span class="nav-link fw-bold text-dark">{{ user.username }}</span>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link text-danger" href="{% url 'logout' %}">
+                                <i class="fas fa-sign-out-alt"></i>
+                            </a>
+                        </li>
+                    {% else %}
+                        <li class="nav-item">
+                            <a class="nav-link" href="{% url 'login' %}">Вхід</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="btn btn-outline-primary btn-sm ms-2 rounded-pill px-3" href="{% url 'register' %}">Реєстрація</a>
+                        </li>
+                    {% endif %}
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <div class="container">
+        {% if messages %}
+            {% for message in messages %}
+                <div class="alert alert-{{ message.tags }} alert-dismissible fade show shadow-sm" role="alert">
+                    {{ message }}
+                    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                </div>
+            {% endfor %}
+        {% endif %}
+    </div>
+
+    <main class="container mb-5">
+        {% block content %}{% endblock %}
+    </main>
+
+    <footer>
+        <div class="container">
+            <small>&copy; 2025 MyCinema Project. Всі права захищено.</small>
+        </div>
+    </footer>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>
