@@ -1,0 +1,219 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Мій профіль{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-lg-4 mb-4">
+        <div class="card shadow-sm border-0">
+            <div class="card-header bg-primary text-white py-3">
+                <h5 class="mb-0"><i class="fas fa-user-cog me-2"></i> Налаштування</h5>
+            </div>
+            <div class="card-body p-4">
+                <form method="post">
+                    {% csrf_token %}
+
+                    <div class="mb-3">
+    <label class="form-label fw-bold small text-secondary">{{ form.username.label }}</label>
+    {{ form.username }}
+    {% if form.username.errors %}
+        <div class="text-danger small">{{ form.username.errors }}</div>
+    {% endif %}
+</div>
+
+<div class="mb-3">
+    <label class="form-label fw-bold small text-secondary">{{ form.email.label }}</label>
+    {{ form.email }}
+    {% if form.email.errors %}
+        <div class="text-danger small">{{ form.email.errors }}</div>
+    {% endif %}
+</div>
+
+<div class="mb-3">
+    <label class="form-label fw-bold small text-secondary" for="{{ form.new_password.id_for_label }}">
+        {{ form.password.label }}
+    </label>
+
+    <input type="password"
+           name="{{ form.new_password.html_name }}"
+           id="{{ form.new_password.id_for_label }}"
+           class="form-control"
+           placeholder="Введіть новий пароль (необов'язково)"
+           autocomplete="new-password"
+           value=""> {% if form.new_password.help_text %}
+        <div class="form-text text-muted small">{{ form.new_password.help_text }}</div>
+    {% endif %}
+
+    {% if form.new_password.errors %}
+        <div class="text-danger small mt-1">{{ form.new_password.errors }}</div>
+    {% endif %}
+</div>
+                    <div class="d-grid gap-2 mt-4">
+                        <button type="submit" class="btn btn-primary fw-bold">
+                            <i class="fas fa-save me-1"></i> Зберегти зміни
+                        </button>
+                        <hr>
+                        <a href="{% url 'profile_delete' user.pk %}" class="btn btn-outline-danger btn-sm">
+                            <i class="fas fa-trash-alt me-1"></i> Видалити акаунт
+                        </a>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-lg-8">
+
+        <div class="card shadow-sm border-0 mb-4">
+            <div class="card-header bg-white border-bottom py-3 d-flex justify-content-between align-items-center">
+                <h5 class="mb-0 text-dark"><i class="fas fa-film me-2 text-primary"></i> Мої фільми</h5>
+                <a href="{% url 'film_create' %}" class="btn btn-sm btn-success"><i class="fas fa-plus"></i> Додати</a>
+            </div>
+            <div class="card-body p-0">
+                {% if my_films %}
+                <div class="table-responsive">
+                    <table class="table table-hover mb-0 align-middle">
+                        <thead class="bg-light">
+                            <tr>
+                                <th class="ps-4">Назва</th>
+                                <th>Жанр</th>
+                                <th class="text-end pe-4">Дії</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for film in my_films %}
+                            <tr>
+                                <td class="ps-4 fw-bold">
+                                    <a href="{% url 'film_detail' film.pk %}" class="text-decoration-none text-dark">{{ film.title }}</a>
+                                </td>
+                                <td><span class="badge bg-secondary">{{ film.genre }}</span></td>
+                                <td class="text-end pe-4">
+                                    <div class="btn-group">
+                                        <a href="{% url 'film_update' film.pk %}" class="btn btn-sm btn-outline-secondary" title="Редагувати">
+                                            <i class="fas fa-edit"></i>
+                                        </a>
+                                        <a href="{% url 'film_delete' film.pk %}" class="btn btn-sm btn-outline-danger" title="Видалити">
+                                            <i class="fas fa-trash-alt"></i>
+                                        </a>
+                                    </div>
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+                {% else %}
+                <div class="p-4 text-center text-muted">
+                    Ви ще не додали жодного фільму.
+                </div>
+                {% endif %}
+            </div>
+        </div>
+
+        <div class="card shadow-sm border-0 mb-4">
+            <div class="card-header bg-white border-bottom py-3">
+                <h5 class="mb-0 text-dark"><i class="fas fa-star me-2 text-warning"></i> Мої оцінки</h5>
+            </div>
+            <div class="card-body p-0">
+                {% if my_scores %}
+                <div class="table-responsive">
+                    <table class="table table-hover mb-0 align-middle">
+                        <thead class="bg-light">
+                            <tr>
+                                <th class="ps-4">Фільм</th>
+                                <th>Оцінка</th>
+                                <th class="text-end pe-4">Дії</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for score in my_scores %}
+                            <tr>
+                                <td class="ps-4">
+                                    <a href="{% url 'film_detail' score.film.pk %}" class="text-decoration-none text-dark fw-bold">
+                                        {{ score.film.title }}
+                                    </a>
+                                </td>
+                                <td>
+                                    <span class="badge bg-warning text-dark border border-dark fs-6">{{ score.score }}</span>
+                                </td>
+                                <td class="text-end pe-4">
+                                    <div class="btn-group">
+                                        <a href="{% url 'update_score' score.pk %}" class="btn btn-sm btn-outline-secondary" title="Змінити">
+                                            <i class="fas fa-edit"></i>
+                                        </a>
+                                        <form method="post" action="{% url 'delete_score' score.pk %}" style="display:inline;">
+                                            {% csrf_token %}
+                                            <button type="submit" class="btn btn-sm btn-outline-danger" style="border-top-left-radius: 0; border-bottom-left-radius: 0;" title="Видалити">
+                                                <i class="fas fa-trash-alt"></i>
+                                            </button>
+                                        </form>
+                                    </div>
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+                {% else %}
+                <div class="p-4 text-center text-muted">
+                    Ви ще не оцінили жодного фільму.
+                </div>
+                {% endif %}
+            </div>
+        </div>
+
+        <div class="card shadow-sm border-0">
+            <div class="card-header bg-white border-bottom py-3">
+                <h5 class="mb-0 text-dark"><i class="fas fa-comments me-2 text-info"></i> Мої коментарі</h5>
+            </div>
+            <div class="card-body p-0">
+                {% if my_comments %}
+                <div class="table-responsive">
+                    <table class="table table-hover mb-0 align-middle">
+                        <thead class="bg-light">
+                            <tr>
+                                <th class="ps-4" style="width: 30%;">Фільм</th>
+                                <th style="width: 50%;">Коментар</th>
+                                <th class="text-end pe-4" style="width: 20%;">Дії</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for comment in my_comments %}
+                            <tr>
+                                <td class="ps-4">
+                                    <a href="{% url 'film_detail' comment.film.pk %}" class="text-decoration-none text-dark fw-bold">
+                                        {{ comment.film.title }}
+                                    </a>
+                                </td>
+                                <td>
+                                    <span class="text-muted fst-italic">"{{ comment.comment|truncatechars:50 }}"</span>
+                                </td>
+                                <td class="text-end pe-4">
+                                    <div class="btn-group">
+                                        <a href="{% url 'update_comment' comment.pk %}" class="btn btn-sm btn-outline-secondary" title="Редагувати">
+                                            <i class="fas fa-edit"></i>
+                                        </a>
+                                        <form method="post" action="{% url 'delete_comment' comment.pk %}" style="display:inline;">
+                                            {% csrf_token %}
+                                            <button type="submit" class="btn btn-sm btn-outline-danger" style="border-top-left-radius: 0; border-bottom-left-radius: 0;" title="Видалити">
+                                                <i class="fas fa-trash-alt"></i>
+                                            </button>
+                                        </form>
+                                    </div>
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+                {% else %}
+                <div class="p-4 text-center text-muted">
+                    Ви ще не залишили жодного коментаря.
+                </div>
+                {% endif %}
+            </div>
+        </div>
+        </div>
+</div>
+{% endblock %}

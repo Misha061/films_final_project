@@ -1,0 +1,36 @@
+{% extends 'base.html' %}
+{% block title %}Видалити акаунт{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center mt-5">
+    <div class="col-md-6 col-lg-5">
+        <div class="card border-danger shadow-lg">
+            <div class="card-header bg-danger text-white py-3">
+                <h4 class="mb-0"><i class="fas fa-skull-crossbones me-2"></i> Видалення акаунту</h4>
+            </div>
+            <div class="card-body p-5 text-center">
+                <h5 class="mb-3">Шановний {{ user.username }},</h5>
+                <p class="text-dark fs-5">Ви дійсно хочете видалити свій профіль?</p>
+                
+                <div class="alert alert-warning text-start">
+                    <i class="fas fa-exclamation-triangle me-2"></i>
+                    <strong>Увага:</strong> Ця дія призведе до видалення:
+                    <ul class="mb-0 mt-2">
+                        <li>Вашого облікового запису</li>
+                        <li>Всіх ваших фільмів</li>
+                        <li>Всіх оцінок та коментарів</li>
+                    </ul>
+                </div>
+
+                <form method="post">
+                    {% csrf_token %}
+                    <div class="d-grid gap-2 d-md-flex justify-content-md-center mt-4">
+                        <a href="{% url 'profile' %}" class="btn btn-light border px-4">Скасувати</a>
+                        <button type="submit" class="btn btn-danger px-4 fw-bold">Так, видалити назавжди</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

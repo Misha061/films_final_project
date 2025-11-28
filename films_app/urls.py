@@ -1,5 +1,5 @@
 from django.urls import path
-from .views import FilmListView, FilmDetailView, FilmCreateView, FilmUpdateView, FilmCommentCreateView ,FilmDeleteView, FilmUpdateCommentView, FilmCommentDeleteView,FilmCreateScoreView, FilmUpdateScoreView, FilmDeleteScoreView ,  login_view, logout_view, register_view
+from .views import FilmListView, FilmDetailView, FilmCreateView, FilmUpdateView, FilmCommentCreateView ,FilmDeleteView, FilmUpdateCommentView, FilmCommentDeleteView,FilmCreateScoreView, FilmUpdateScoreView, FilmDeleteScoreView ,FilmUserUpdateView, FilmUserDeleteView , login_view, logout_view, register_view
 
 urlpatterns = [
 
@@ -17,5 +17,7 @@ urlpatterns = [
     path('<int:pk>/add_score/', FilmCreateScoreView.as_view(), name='add_score'),
     path('<int:pk>/score_update/', FilmUpdateScoreView.as_view(), name='update_score'),
     path('<int:pk>/score_delete/', FilmDeleteScoreView.as_view(), name='delete_score'),
+    path("profile/", FilmUserUpdateView.as_view(), name="profile" ),
+    path("profile/<int:pk>/delete/", FilmUserDeleteView.as_view(), name="profile_delete"),
 
 ]

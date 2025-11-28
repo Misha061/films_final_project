@@ -5,11 +5,12 @@ from django.contrib.auth.models import User
 # Create your models here.
 
 class Film(models.Model):
+    user = models.ForeignKey(User, on_delete=models.CASCADE, null=True, blank=True)
     title = models.CharField(max_length=100)
     description = models.TextField()
     genre = models.CharField(max_length=100)
     photoname = models.CharField(max_length=100)
-
+    publication_date = models.DateField(auto_now_add=True)
     def __str__(self):
             return f"{self.title}"
 
@@ -38,3 +39,4 @@ class FilmScore(models.Model):
 
     def get_absolute_url(self):
         return reverse('film_detail', kwargs={'pk': self.pk})
+

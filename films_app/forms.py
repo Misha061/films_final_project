@@ -2,7 +2,7 @@ from django import forms
 from .models import Film, FilmScore, FilmComment
 from django.contrib.auth.forms import UserCreationForm
 from django.contrib.auth.models import User
-from django.urls import reverse
+
 
 
 class FilmForm(forms.ModelForm):
@@ -22,6 +22,11 @@ class FilmCommentForm(forms.ModelForm):
     class Meta:
         model = FilmComment
         fields = ['comment']
+
+class FilmUserForm(forms.ModelForm):
+    class Meta:
+        model = User
+        fields = ['username', 'email', 'password']
 
 
 class LoginForm(forms.Form):

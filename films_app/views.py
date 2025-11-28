@@ -1,12 +1,16 @@
+from django.contrib.auth.forms import PasswordChangeForm
+from django.http import request
 from django.shortcuts import render, redirect, get_object_or_404
 from .utils import average_score
 from django.urls import reverse_lazy
 from django.views.generic import DetailView, CreateView, UpdateView, DeleteView, ListView
-from .forms import FilmForm, FilmCommentForm, FilmScoreForm , LoginForm, RegisterForm
+from .forms import FilmForm, FilmCommentForm, FilmScoreForm , LoginForm, RegisterForm, FilmUserForm
 from .models import Film, FilmScore, FilmComment
-from django.contrib.auth import login, authenticate, logout
+from django.contrib.auth import login, authenticate, logout, update_session_auth_hash
 from django.contrib import messages
 from django.contrib.auth.mixins import LoginRequiredMixin, UserPassesTestMixin, PermissionRequiredMixin
+from django.contrib.auth.models import User
+
 
 def login_view(request):
     if request.method == "GET":
@@ -166,7 +170,6 @@ class FilmCreateScoreView(LoginRequiredMixin,CreateView):
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-
         context['film'] = get_object_or_404(Film, pk=self.kwargs['pk'])
         return context
 
@@ -199,3 +202,50 @@ class FilmDeleteScoreView(UserPassesTestMixin,DeleteView):
     def test_func(self):
         comment = self.get_object()
         return comment.user == self.request.user
+
+class FilmUserUpdateView(UserPassesTestMixin, LoginRequiredMixin ,UpdateView):
+    model = User
+    form_class = FilmUserForm
+    template_name = "user_profile.html"
+
+    def get_object(self):
+        return self.request.user
+
+    def get_success_url(self):
+        return reverse_lazy('profile')
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['my_films'] = Film.objects.filter(user=self.object)
+        context['my_scores'] = FilmScore.objects.filter(user=self.object)
+        context['my_comments'] = FilmComment.objects.filter(user=self.object)
+
+        return context
+
+    def form_valid(self, form):
+        user = form.save(commit=False)
+        new_password = form.cleaned_data.get('password')
+
+        if new_password:
+            user.set_password(new_password)
+            user.save()
+            update_session_auth_hash(self.request, user)
+        else:
+            user.save()
+        return redirect(self.get_success_url())
+
+    def test_func(self):
+        profile_user = self.get_object()
+        return profile_user == self.request.user
+
+class FilmUserDeleteView(UserPassesTestMixin,DeleteView):
+    model = User
+    template_name = "delete_user.html"
+
+
+    def get_success_url(self):
+        return reverse_lazy('login')
+
+    def test_func(self):
+        user_profile = self.get_object()
+        return user_profile.pk == self.request.user.pk

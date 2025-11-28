@@ -5,22 +5,33 @@
 
 {% block content %}
 <div class="row mb-4 align-items-center">
-    <div class="col-md-6">
+    <div class="col-md-5">
         <h1 class="fw-light text-dark"><i class="fas fa-video text-primary"></i> Бібліотека фільмів</h1>
     </div>
-    <div class="col-md-6">
-        <form method="get" class="d-flex gap-2 bg-white p-2 rounded shadow-sm">
-            <input type="text" name="title" class="form-control border-0" placeholder="Пошук назви..." value="{{ request.GET.title|default:'' }}" style="margin-bottom: 0;">
-            <input type="text" name="genre" class="form-control border-0" placeholder="Жанр..." value="{{ request.GET.genre|default:'' }}" style="margin-bottom: 0;">
-            <button type="submit" class="btn btn-primary"><i class="fas fa-search"></i></button>
-        </form>
+
+    <div class="col-md-7">
+        <div class="d-flex justify-content-md-end gap-2 align-items-center">
+
+            <form method="get" class="d-flex gap-2 bg-white p-1 rounded shadow-sm border me-2 flex-grow-1">
+                <input type="text" name="title" class="form-control border-0 form-control-sm" placeholder="Назва..." value="{{ request.GET.title|default:'' }}">
+                <input type="text" name="genre" class="form-control border-0 form-control-sm" placeholder="Жанр..." value="{{ request.GET.genre|default:'' }}">
+                <button type="submit" class="btn btn-primary btn-sm"><i class="fas fa-search"></i></button>
+            </form>
+
+            {% if user.is_authenticated %}
+                <a href="{% url 'profile' %}" class="btn btn-outline-dark shadow-sm" title="Мій кабінет">
+                    <i class="fas fa-user-circle me-1"></i> Профіль
+                </a>
+            {% endif %}
+
+        </div>
     </div>
 </div>
 
 <div class="row">
     {% for film in object_list %}
     <div class="col-md-4 mb-4">
-        <div class="card h-100">
+        <div class="card h-100 shadow-sm border-0">
             <div style="height: 250px; overflow: hidden; border-top-left-radius: 10px; border-top-right-radius: 10px;">
                 {% if film.photoname %}
                     <img src="{% static film.photoname %}" class="w-100 h-100" alt="{{ film.title }}" style="object-fit: cover;">
@@ -47,7 +58,11 @@
     <div class="col-12 text-center py-5">
         <div class="text-muted mb-3"><i class="fas fa-film fa-4x"></i></div>
         <h3 class="text-muted">Фільмів поки що немає</h3>
-        <a href="{% url 'film_create' %}" class="btn btn-primary mt-2">Додати перший фільм</a>
+        {% if user.is_authenticated %}
+            <a href="{% url 'film_create' %}" class="btn btn-primary mt-2">Додати перший фільм</a>
+        {% else %}
+            <a href="{% url 'login' %}" class="btn btn-primary mt-2">Увійдіть, щоб додати</a>
+        {% endif %}
     </div>
     {% endfor %}
 </div>
