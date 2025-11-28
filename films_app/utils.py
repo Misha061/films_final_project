@@ -1,6 +1,6 @@
 def average_score(scores) -> float:
     if not scores:
-        return 0
+        return 0.0
 
     scores_sum = sum(scores)
     scores_count = len(scores)

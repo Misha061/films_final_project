@@ -74,9 +74,9 @@ class FilmDetailView(DetailView):
         context = super().get_context_data(**kwargs)
 
         context['comment_form'] = FilmCommentForm()
-
+        scores = FilmScore.objects.values_list('score', flat=True).filter(film = self.object.pk)
         context['user_score'] = None
-        context['average_score'] = average_score(FilmScore.objects.values_list('score', flat=True))
+        context['average_score'] = average_score(scores)
         if self.request.user.is_authenticated:
             context['user_score'] = FilmScore.objects.filter(
                 film=self.object,
