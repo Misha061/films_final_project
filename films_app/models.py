@@ -34,5 +34,7 @@ class FilmScore(models.Model):
 
     def __str__(self):
         return f"{self.score}"
+
+
     def get_absolute_url(self):
         return reverse('film_detail', kwargs={'pk': self.pk})

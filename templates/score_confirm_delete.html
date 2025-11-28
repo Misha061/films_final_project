@@ -1,0 +1,37 @@
+{% extends 'base.html' %}
+
+{% block title %}Видалити оцінку{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center mt-5">
+    <div class="col-md-6 col-lg-5">
+        <div class="card border-danger shadow-sm">
+            <div class="card-header bg-danger text-white py-3">
+                <h5 class="mb-0">
+                    <i class="fas fa-trash-alt me-2"></i> Видалення оцінки
+                </h5>
+            </div>
+            <div class="card-body p-4 text-center">
+                <p class="text-muted mb-2">Ви впевнені, що хочете видалити свою оцінку для фільму:</p>
+                <h4 class="mb-4 text-dark">"{{ object.film.title }}"</h4>
+                
+                <div class="alert alert-light border d-inline-block px-4 py-2 mb-4">
+                    Ваша поточна оцінка: <strong class="text-warning fs-5">{{ object.score }}</strong>
+                </div>
+
+                <form method="post">
+                    {% csrf_token %}
+                    <div class="d-flex justify-content-center gap-2">
+                        <a href="{% url 'film_detail' object.film.pk %}" class="btn btn-light border">
+                            Ні, залишити
+                        </a>
+                        <button type="submit" class="btn btn-danger fw-bold shadow-sm">
+                            Так, видалити
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

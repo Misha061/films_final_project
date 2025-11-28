@@ -29,44 +29,94 @@
                 </div>
 
                 <div class="col-md-7">
-                    <div class="card-body p-4 p-lg-5 d-flex flex-column h-100">
-                        <h1 class="display-6 fw-bold text-dark mb-2">{{ object.title }}</h1>
+    <div class="card-body p-4 p-lg-5 d-flex flex-column h-100">
+        <h1 class="display-6 fw-bold text-dark mb-2">{{ object.title }}</h1>
 
-                        <span class="badge bg-primary bg-opacity-10 text-primary mb-3 align-self-start fs-6 border border-primary border-opacity-25">
-                            {{ object.genre }}
-                        </span>
+        <span class="badge bg-primary bg-opacity-10 text-primary mb-3 align-self-start fs-6 border border-primary border-opacity-25">
+            {{ object.genre }}
+        </span>
 
-                        <h5 class="text-secondary mt-2">Про фільм:</h5>
-                        <p class="card-text text-dark fs-6">{{ object.description }}</p>
+        <div class="d-flex flex-wrap justify-content-between align-items-center mb-3 border p-3 rounded bg-light">
+            <div class="d-flex align-items-center mb-2 mb-md-0">
+                <span class="text-secondary me-2">Рейтинг:</span>
+                <span class="fw-bold text-warning fs-4 me-3">
+                    <i class="fas fa-star"></i> {{ average_score|default:"0" }}
+                </span>
+                <span class="badge bg-secondary rounded-pill">{{ object.filmscore_set.count }} голосів</span>
+            </div>
 
-                        <div class="mt-auto">
-                            <hr>
-                            <div class="d-flex justify-content-between align-items-center mb-4">
-                                <div>
-                                    <span class="text-muted me-2">Рейтинг:</span>
-                                    <span class="fw-bold text-warning"><i class="fas fa-star"></i> {{ object.rating|default:"-" }}</span>
-                                </div>
-                                <div class="text-muted small">
-                                    Додав: <strong>{{ object.user.username }}</strong>
-                                </div>
-                            </div>
+            <div>
+                {% if user.is_authenticated %}
 
-                            <div class="d-flex gap-2">
-                                <a href="{% url 'film_catalog' %}" class="btn btn-outline-secondary">
-                                    <i class="fas fa-arrow-left"></i> Назад
-                                </a>
-                                {% if object.user == user %}
-                                    <a href="{% url 'film_update' object.pk %}" class="btn btn-primary">
-                                        <i class="fas fa-edit"></i> Редагувати
-                                    </a>
-                                    <a href="{% url 'film_delete' object.pk %}" class="btn btn-danger">
-                                        <i class="fas fa-trash"></i> Видалити
-                                    </a>
-                                {% endif %}
-                            </div>
-                        </div>
-                    </div>
+                    {% if user_score %}
+                        <div class="d-flex align-items-center">
+    <span class="me-2 text-dark small">Ви поставили:</span>
+    <span class="badge bg-warning text-dark fs-6 me-3 border border-dark">
+        {{ user_score.score }}
+    </span>
+
+    <div class="btn-group shadow-sm" role="group">
+
+        <a href="{% url 'update_score' user_score.pk %}"
+           class="btn btn-sm btn-outline-dark p-0 d-flex justify-content-center align-items-center"
+           title="Змінити оцінку"
+           style="width: 36px; height: 36px;">
+            <i class="fas fa-edit"></i>
+        </a>
+
+        <form method="post" action="{% url 'delete_score' user_score.pk %}">
+            {% csrf_token %}
+            <button type="submit"
+                    class="btn btn-sm btn-outline-danger p-0 d-flex justify-content-center align-items-center"
+                    title="Видалити"
+                    style="width: 36px; height: 36px;">
+                <i class="fas fa-trash-alt"></i>
+            </button>
+        </form>
+
+    </div>
+</div>
+
+
+
+                    {% else %}
+                        <a href="{% url 'add_score' object.pk %}" class="btn btn-sm btn-warning fw-bold text-dark shadow-sm d-flex align-items-center">
+                            <i class="far fa-star me-2"></i> Оцінити
+                        </a>
+                    {% endif %}
+
+                {% else %}
+                    <span class="text-muted small">Увійдіть для оцінки</span>
+                {% endif %}
+            </div>
+        </div>
+        <h5 class="text-secondary mt-2">Про фільм:</h5>
+        <p class="card-text text-dark fs-6">{{ object.description }}</p>
+
+        <div class="mt-auto">
+            <hr>
+            <div class="d-flex justify-content-between align-items-center mb-3">
+                <div class="text-muted small">
+                    Додав: <strong>{{ object.user.username }}</strong>
                 </div>
+            </div>
+
+            <div class="d-flex gap-2">
+                <a href="{% url 'film_catalog' %}" class="btn btn-outline-secondary">
+                    <i class="fas fa-arrow-left"></i> Назад
+                </a>
+                {% if object.user == user %}
+                    <a href="{% url 'film_update' object.pk %}" class="btn btn-primary">
+                        <i class="fas fa-edit"></i> Редагувати
+                    </a>
+                    <a href="{% url 'film_delete' object.pk %}" class="btn btn-danger">
+                        <i class="fas fa-trash"></i> Видалити
+                    </a>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
             </div>
         </div>
 
@@ -95,16 +145,19 @@
                                         <button class="btn btn-link text-secondary p-0" type="button" data-bs-toggle="dropdown">
                                             <i class="fas fa-ellipsis-v"></i>
                                         </button>
-                                        <ul class="dropdown-menu dropdown-menu-end">
+                                        <ul class="dropdown-menu dropdown-menu-end shadow">
                                             <li>
                                                 <a class="dropdown-item text-success" href="{% url 'update_comment' item.pk %}">
                                                     <i class="fas fa-edit me-2"></i>Редагувати
                                                 </a>
                                             </li>
                                             <li>
-                                                <a class="dropdown-item text-danger" href="{% url 'delete_comment' item.pk %}">
-                                                    <i class="fas fa-trash-alt me-2"></i>Видалити
-                                                </a>
+                                                <form method="post" action="{% url 'delete_comment' item.pk %}">
+                                                    {% csrf_token %}
+                                                    <button type="submit" class="dropdown-item text-danger">
+                                                        <i class="fas fa-trash-alt me-2"></i>Видалити
+                                                    </button>
+                                                </form>
                                             </li>
                                         </ul>
                                     </div>
@@ -156,4 +209,5 @@
 
     </div>
 </div>
-{% endblock %}
+    {% endblock %}
+</div>
